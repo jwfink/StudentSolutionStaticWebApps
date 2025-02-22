@@ -1,0 +1,39 @@
+﻿@page "/students"
+@inject HttpClient Http
+
+
+<PageTitle>Students</PageTitle>
+
+<h1>Students</h1>
+
+@if (Qstudents == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <QuickGrid Items="@Qstudents" Pagination="@pagination">
+        <PropertyColumn Property="@(_=>_.StudentId)" Sortable="true" />
+        <PropertyColumn Property="@(_=>_.FirstName)" Sortable="true" />
+        <PropertyColumn Property="@(_=>_.LastName)" Sortable="true" />
+        <PropertyColumn Property="@(_=>_.School)" Sortable="true" />
+         <TemplateColumn Title="Edit">
+            <a class="btn btn-success btn-sm" href="/updel/@context.StudentId/edit">Edit</a>
+         </TemplateColumn>
+         <TemplateColumn Title="Delete">
+            <a class="btn btn-danger btn-sm" href="/updel/@context.StudentId/del">Delete</a>
+         </TemplateColumn>
+
+    </QuickGrid>
+    
+    <Paginator State="@pagination" />
+}
+
+@code {
+    IQueryable<Student>? Qstudents;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 15 };
+    protected override async Task OnInitializedAsync()
+    {
+        Qstudents = (await Http.GetFromJsonAsync<Student[]>($"{Constants.BASE_URL}api/students")).AsQueryable();
+    }
+}
